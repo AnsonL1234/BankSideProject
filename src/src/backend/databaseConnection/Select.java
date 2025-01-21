@@ -9,7 +9,7 @@ public class Select extends DatabaseConnection{
      * this will retrieve all the information from database,
      * so whenever the user execute the program, it will first retrieve all data from database
      * */
-    protected static void retrieveUserValue() {
+    protected void retrieveUserValue() {
 
         String userQuery = "SELECT * FROM bank_app_database.user";
 
@@ -37,7 +37,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveProfileValue() {
+    private void retrieveProfileValue() {
         String profileQuery = "SELECT * FROM bank_app_database.profile";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);
@@ -62,7 +62,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveAccountValue() {
+    private void retrieveAccountValue() {
         String accountQuery = "SELECT * FROM bank_app_database.account";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);
@@ -85,7 +85,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveCurrencyValue() {
+    private void retrieveCurrencyValue() {
         String currencyQuery = "SELECT * FROM bank_app_database.currency";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);
@@ -105,7 +105,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveCurrencyExchangeValue() {
+    private void retrieveCurrencyExchangeValue() {
         String currency_exchangeQuery = "SELECT * FROM bank_app_database.currency_exchange";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);
@@ -127,7 +127,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveTransactionValue() {
+    private void retrieveTransactionValue() {
         String transactionQuery = "SELECT * FROM bank_app_database.transaction";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);
@@ -150,7 +150,7 @@ public class Select extends DatabaseConnection{
         }
     }
 
-    private static void retrieveLoanValue() {
+    private void retrieveLoanValue() {
         String loanQuery = "SELECT * FROM bank_app_database.loan";
         try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
             connectDatabase.setAutoCommit(false);

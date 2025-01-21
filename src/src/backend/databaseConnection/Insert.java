@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Insert extends DatabaseConnection {
 
     /** Insertion the new value for user registration */
-    protected static boolean isUserRegister(
+    protected boolean isUserRegister(
             String user_ID, String user_password, String email_address,
             int profile_ID, String avatar_path, String first_name, String last_name, LocalDate date_of_birth, double phone_number, String address,
             String account_ID, String type_of_account, double current_balance, double available_balance, String currency_ID, String currency_name
@@ -90,7 +90,7 @@ public class Insert extends DatabaseConnection {
     }
 
     /** Insert the new transaction  */
-    protected static boolean isTransferInsert(
+    protected boolean isTransferInsert(
             int transaction_ID, String payment_ID, String payment_Receiver_ID,
             double transaction_amount, LocalDateTime transfer_date
     ) {
@@ -115,9 +115,7 @@ public class Insert extends DatabaseConnection {
 
             if(rowAffectedTransaction > 0) {
                 System.out.println("New transaction added to the database!");
-                return true;
             }
-
             return true;
         } catch (SQLException e) {
             try {
@@ -131,7 +129,7 @@ public class Insert extends DatabaseConnection {
         }
     }
 
-    protected static boolean isCurrencyExchangeInsert(
+    protected boolean isCurrencyExchangeInsert(
             int exchange_ID, String base_exchange_currency, String target_exchange_currency, Double exchange_date
     ) {
         Connection connectDatabase = null;
@@ -170,7 +168,7 @@ public class Insert extends DatabaseConnection {
         }
     }
 
-    protected static boolean isLoanInsert(
+    protected boolean isLoanInsert(
             int loan_ID, String user_ID, String account_ID, Double loan_amount, Date start_date, Date end_date
     ) {
         Connection connectDatabase = null;
