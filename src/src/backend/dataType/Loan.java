@@ -11,7 +11,7 @@ public class Loan {
     Random random = new Random();
 
     public Loan() {
-        this.loanId = generateID();
+        this.loanId = 0;
         this.loanAmount = 0.0;
         this.startDate = null;
         this.endDate = null;
@@ -24,14 +24,7 @@ public class Loan {
         this.endDate = endDate;
     }
 
-    private int generateID() {
-        int randomNumber = random.nextInt(2000);
-        return randomNumber;
-    }
-
-    public int getLoanId() {
-        return loanId;
-    }
+    public int getLoanId() {return loanId;}
 
     public void setLoanId(int loanId) {
         this.loanId = loanId;

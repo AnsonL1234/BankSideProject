@@ -3,36 +3,30 @@ package src.backend.dataType;
 import java.util.Random;
 
 public class Currency_Exchange_Rate {
-    private String exchangeId;
+    private int exchangeId;
     private String baseCurrencyId;
     private String targetCurrencyId;
     private double exchangeRate;
-    Random random = new Random();
 
     public Currency_Exchange_Rate() {
-        this.exchangeId = generateID();
+        this.exchangeId = 0;
         this.baseCurrencyId = "";
         this.targetCurrencyId = "";
         this.exchangeRate = 0.0;
     }
 
-    public Currency_Exchange_Rate(String exchangeId, String baseCurrencyId, String targetCurrencyId, double exchangeRate) {
+    public Currency_Exchange_Rate(int exchangeId, String baseCurrencyId, String targetCurrencyId, double exchangeRate) {
         this.exchangeId = exchangeId;
         this.baseCurrencyId = baseCurrencyId;
         this.targetCurrencyId = targetCurrencyId;
         this.exchangeRate = exchangeRate;
     }
 
-    private String generateID() {
-        int randomNumber = random.nextInt(1000);
-        return String.format("CER%03d", randomNumber);
-    }
-
-    public String getExchangeId() {
+    public int getExchangeId() {
         return exchangeId;
     }
 
-    public void setExchangeId(String exchangeId) {
+    public void setExchangeId(int exchangeId) {
         this.exchangeId = exchangeId;
     }
 
@@ -63,16 +57,5 @@ public class Currency_Exchange_Rate {
     @Override
     public String toString() {
         return "Currency_Exchange_Rate [exchangeId=" + exchangeId + ", baseCurrencyId=" + baseCurrencyId + ", targetCurrencyId=" + targetCurrencyId + ", exchangeRate=" + exchangeRate + "]";
-    }
-
-    public static void main(String[] args) {
-
-        Currency_Exchange_Rate account1 = new Currency_Exchange_Rate();
-        Currency_Exchange_Rate account2 = new Currency_Exchange_Rate();
-        Currency_Exchange_Rate account3 = new Currency_Exchange_Rate();
-
-        System.out.println("Account 1 ID: " + account1.getExchangeId());
-        System.out.println("Account 2 ID: " + account2.getExchangeId());
-        System.out.println("Account 3 ID: " + account3.getExchangeId());
     }
 }

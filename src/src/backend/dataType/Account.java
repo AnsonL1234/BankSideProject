@@ -16,7 +16,7 @@ public class Account {
     Random random = new Random();
 
     public Account() {
-        this.accountId = generateID();
+        this.accountId = "";
         this.typeOfAccount = "";
         this.currentBalance = 0.0;
         this.availableBalance = 0.0;
@@ -30,11 +30,6 @@ public class Account {
         this.availableBalance = availableBalance;
         this.currency = currency;
         this.transactions = new ArrayList<>();
-    }
-
-    private String generateID() {
-        int randomNumber = random.nextInt(1000);
-        return String.format("A%03d", randomNumber);
     }
 
     public String getAccountId() {

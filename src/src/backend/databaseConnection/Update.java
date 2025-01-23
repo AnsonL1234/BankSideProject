@@ -1,17 +1,21 @@
 package src.backend.databaseConnection;
 
+import src.backend.ID_Generator;
+
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Update extends DatabaseConnection {
 
-    protected void processTheTransaction(
+    public void processTheTransaction(
             String payment_ID, String payment_receiver_ID, Double amount
     ) {
 
-        String updateSenderQuery = "UPDATE bank_app_database.account SET current_balance = current_balance - ?, available_balance = available_balance - ? WHERE account_ID = ?";
-        String updateReceiverQuery = "UPDATE bank_app_database.account SET current_balance = current_balance + ?, available_balance = available_balance + ? WHERE account_ID = ?";
+        String updateSenderQuery = "UPDATE bank_app_database.account SET currency_balance = currency_balance - ?, available_balance = available_balance - ? WHERE account_ID = ?";
+        String updateReceiverQuery = "UPDATE bank_app_database.account SET currency_balance = currency_balance + ?, available_balance = available_balance + ? WHERE account_ID = ?";
 
         //reference variable from another class
         Insert transactionRecord = new Insert();
@@ -22,25 +26,42 @@ public class Update extends DatabaseConnection {
         try{
             databaseConnect = DriverManager.getConnection(url,username,password);
             databaseConnect.setAutoCommit(false);
+            System.out.println("Connect to database");
+
 
             //execute statement for update the transaction query after the user send the money
-            try (PreparedStatement updateSender = databaseConnect.prepareStatement(updateSenderQuery)) {
-                updateSender.setDouble(1, amount);
-                updateSender.setDouble(2, amount);
-                updateSender.setString(3, payment_ID);
-                updateSender.executeUpdate();
+            PreparedStatement updateSender = databaseConnect.prepareStatement(updateSenderQuery);
+            System.out.println("Preparing statement");
+            updateSender.setDouble(1, amount);
+            updateSender.setDouble(2, amount);
+            updateSender.setString(3, payment_ID);
+            int rowsSender = updateSender.executeUpdate();
+
+            if (rowsSender == 0) {
+                System.out.println("No rows updated for sender. Check account ID: " + payment_ID);
             }
 
             //execute this statement for update the transaction query after the user receive the money
-            try (PreparedStatement updateReceiver = databaseConnect.prepareStatement(updateReceiverQuery)) {
-                updateReceiver.setDouble(1, amount);
-                updateReceiver.setDouble(2, amount);
-                updateReceiver.setString(3, payment_receiver_ID);
-                updateReceiver.executeUpdate();
+            PreparedStatement updateReceiver = databaseConnect.prepareStatement(updateReceiverQuery);
+            System.out.println("Preparing second statement");
+            updateReceiver.setDouble(1, amount);
+            updateReceiver.setDouble(2, amount);
+            updateReceiver.setString(3, payment_receiver_ID);
+            int rowsReceiver = updateReceiver.executeUpdate();
+
+            if (rowsReceiver == 0) {
+                System.out.println("No rows updated for receiver. Check account ID: " + payment_receiver_ID);
             }
 
             //commit the update after executing the query
             databaseConnect.commit();
+            System.out.println("Transaction processed successfully.");
+
+            ID_Generator idGenerator = new ID_Generator();
+            LocalDateTime localDateTime = LocalDateTime.now();
+            Timestamp timestamp = Timestamp.valueOf(localDateTime);
+            transactionRecord.newTransferInsert(idGenerator.generate_transaction_ID(), payment_ID, payment_receiver_ID, amount, timestamp);
+            System.out.println("Transaction record successfully.");
 
         } catch (SQLException e) {
             try {
@@ -50,11 +71,12 @@ public class Update extends DatabaseConnection {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+            e.printStackTrace();
         }
     }
 
     /** Apply Loan is the method that will process the loan application */
-    protected void applyLoan(
+    public void applyLoan(
             String user_ID, String account_ID, Double loan_amount
     ) {
 

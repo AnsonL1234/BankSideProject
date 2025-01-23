@@ -1,176 +1,157 @@
 package src.backend.databaseConnection;
 
+import src.backend.dataType.*;
+
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Select extends DatabaseConnection{
+public class Select extends DatabaseConnection {
 
-    /**
-     * this will retrieve all the information from database,
-     * so whenever the user execute the program, it will first retrieve all data from database
-     * */
-    protected void retrieveUserValue() {
+    public User retrieveInfoByLogin(String emailOrUserID, String password) {
+        User user = null;
+        String userQuery = "SELECT * FROM bank_app_database WHERE (email_address = ? OR user_ID = ?) AND user_password = ?";
 
-        String userQuery = "SELECT * FROM bank_app_database.user";
+        try (Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = connectDatabase.prepareStatement(userQuery);
 
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
+            statement.setString(1, emailOrUserID);
+            statement.setString(2, emailOrUserID);
+            statement.setString(3, password);
 
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet user_Query = queryStatement.executeQuery(userQuery);
+            ResultSet queryExecute = statement.executeQuery();
 
-                while (user_Query.next()) {
-                    String user_ID = user_Query.getString("user_ID");
-                    String user_password = user_Query.getString("user_password");
-                    String email_Address = user_Query.getString("email_Address");
-                    int profile_ID = user_Query.getInt("profile_ID");
-                    String account_ID = user_Query.getString("account_ID");
-                }
+            if (queryExecute.next()) {
+                user = new User();
+                user.setUserID(queryExecute.getString("user_ID"));
+                user.setPassword(queryExecute.getString("user_password"));
+                user.setEmailAddress(queryExecute.getString("email_address"));
+
+                int profile_ID = queryExecute.getInt("profile_ID");
+                Profile profile = retrieveDataByProfileID(profile_ID);
+                user.setProfile(profile);
+
+                List<Account> accountList = retrieveAccountByUserID(user.getUserID());
+                user.setAccounts(accountList);
+
             }
-
-            //commit the change after retrieve the data from database
-            connectDatabase.commit();
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        return user;
     }
 
-    private void retrieveProfileValue() {
-        String profileQuery = "SELECT * FROM bank_app_database.profile";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
+    protected Profile retrieveDataByProfileID(int profile_ID) {
+        Profile profile = null;
+        String profileQuery = "SELECT * FROM bank_app_database.profile WHERE profile_ID = ?";
 
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet profile_Query = queryStatement.executeQuery(profileQuery);
+        try (Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement profileState = connectDatabase.prepareStatement(profileQuery);
 
-                while (profile_Query.next()) {
-                    int profile_ID = profile_Query.getInt("profile_ID");
-                    String avatar_path = profile_Query.getString("avatar_path");
-                    String first_name = profile_Query.getString("first_name");
-                    String last_name = profile_Query.getString("last_name");
-                    Date date_of_birth = profile_Query.getDate("date_of_birth");
-                    Double phone_number = profile_Query.getDouble("phone_number");
-                    String address = profile_Query.getString("address");
-                }
+            profileState.setInt(1, profile_ID);
+
+            ResultSet profileResult = profileState.executeQuery();
+
+            if (profileResult.next()) {
+                profile = new Profile();
+                profile.setProfileId(profileResult.getInt("profile_ID"));
+                profile.setAvatar_Path(profileResult.getString("avatar_path"));
+                profile.setFirstName(profileResult.getString("first_name"));
+                profile.setLastName(profileResult.getString("last_name"));
+                profile.setDateOfBirth(profileResult.getDate("date_of_birth"));
+                profile.setPhoneNumber(profileResult.getInt("phone_number"));
+                profile.setSpecificAddress(profileResult.getString("address"));
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return profile;
     }
 
-    private void retrieveAccountValue() {
-        String accountQuery = "SELECT * FROM bank_app_database.account";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
+    protected List<Account> retrieveAccountByUserID(String user_ID) {
+        List<Account> accountList = new ArrayList<>();
+        String accountQuery = "SELECT * FROM bank_app_database.account JOIN bank_app_database.user ON account.account_ID = user.account_ID WHERE user_ID = ?";
 
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet account_Query = queryStatement.executeQuery(accountQuery);
+        try (Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement accountState = connectDatabase.prepareStatement(accountQuery);
 
-                while (account_Query.next()) {
-                    String account_ID = account_Query.getString("account_ID");
-                    String type_of_account = account_Query.getString("type_of_account");
-                    Double current_balance = account_Query.getDouble("current_balance");
-                    Double available_balance = account_Query.getDouble("available_balance");
-                    String currency_ID = account_Query.getString("currency_ID");
-                }
+            accountState.setString(1, user_ID);
+
+            ResultSet accountResult = accountState.executeQuery();
+
+            while (accountResult.next()) {
+                Account account = new Account();
+                account.setAccountId(accountResult.getString("account_ID"));
+                account.setTypeOfAccount(accountResult.getString("type_of_account"));
+                account.setCurrentBalance(accountResult.getDouble("current_balance"));
+                account.setAvailableBalance(accountResult.getDouble("available_balance"));
+
+                Currency currency = retrieveCurrencyByAccountID(account.getAccountId());
+                account.setCurrency(currency);
+
+                List<Transaction> transactions = retrieveTransactionByAccountID(account.getAccountId());
+                account.setTransactions(transactions);
+
+                accountList.add(account);
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        return accountList;
     }
 
-    private void retrieveCurrencyValue() {
-        String currencyQuery = "SELECT * FROM bank_app_database.currency";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
+    protected Currency retrieveCurrencyByAccountID(String account_ID) {
+        Currency currency = null;
 
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet currency_Query = queryStatement.executeQuery(currencyQuery);
+        String currencyQuery = "SELECT * FROM bank_app_database.currency JOIN bank_app_database.account ON currency.currency_ID = account.currency_ID WHERE account_ID = ?";
 
-                while (currency_Query.next()) {
-                    String currency_ID = currency_Query.getString("currency_ID");
-                    String currency_name = currency_Query.getString("currency_name");
-                }
+        try (Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement currencyState = connectDatabase.prepareStatement(currencyQuery);
+
+            currencyState.setString(1, account_ID);
+
+            ResultSet currencyResult = currencyState.executeQuery();
+
+            if (currencyResult.next()) {
+                currency = new Currency();
+                currency.setCurrencyId(currencyResult.getString("currency_ID"));
+                currency.setCurrencyName(currencyResult.getString("currency_name"));
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return currency;
     }
 
-    private void retrieveCurrencyExchangeValue() {
-        String currency_exchangeQuery = "SELECT * FROM bank_app_database.currency_exchange";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
+    protected List<Transaction> retrieveTransactionByAccountID(String account_ID) {
+        List<Transaction> transactions = new ArrayList<>();
 
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet currency_exchange_Query = queryStatement.executeQuery(currency_exchangeQuery);
+        String transactionQuery = "SELECT * FROM bank_app_database.account " +
+                "JOIN bank_app_database.transaction " +
+                "ON account_ID = payment_ID OR account_ID = payment_receiver_ID WHERE account_ID = ?";
 
-                while (currency_exchange_Query.next()) {
-                    int exchange_ID = currency_exchange_Query.getInt("exchange_ID");
-                    String base_exchange_currency = currency_exchange_Query.getString("base_exchange_currency");
-                    String target_exchange_currency = currency_exchange_Query.getString("target_exchange_currency");
-                    Double exchange_rate = currency_exchange_Query.getDouble("exchange_rate");
-                }
+        try (Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement transactionState = connectDatabase.prepareStatement(transactionQuery);
+
+            transactionState.setString(1,account_ID);
+
+            ResultSet transactionResult = transactionState.executeQuery();
+            while (transactionResult.next()) {
+                Transaction transaction = new Transaction();
+                transaction.setTransactionId(transactionResult.getInt("transaction_ID"));
+                transaction.setPayment_ID(transactionResult.getString("payment_ID"));
+                transaction.setPayment_receiver_ID(transactionResult.getString("payment_receiver_ID"));
+                transaction.setTransactionAmount(transactionResult.getDouble("transaction_amount"));
+                transaction.setTransferDate(transactionResult.getDate("transfer_date"));
+                transactions.add(transaction);
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-    }
 
-    private void retrieveTransactionValue() {
-        String transactionQuery = "SELECT * FROM bank_app_database.transaction";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
-
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet transaction_Query = queryStatement.executeQuery(transactionQuery);
-
-                while (transaction_Query.next()) {
-                    int transaction_ID = transaction_Query.getInt("transaction_ID");
-                    String payment_ID = transaction_Query.getString("payment_ID");
-                    String payment_receiver_ID = transaction_Query.getString("payment_receiver_ID");
-                    Double transaction_amount = transaction_Query.getDouble("transaction_amount");
-                    Date transfer_date = transaction_Query.getDate("transfer_date");
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void retrieveLoanValue() {
-        String loanQuery = "SELECT * FROM bank_app_database.loan";
-        try ( Connection connectDatabase = DriverManager.getConnection(url, username, password)) {
-            connectDatabase.setAutoCommit(false);
-
-            if(connectDatabase != null) {
-                Statement queryStatement = connectDatabase.createStatement();
-                ResultSet loan_Query = queryStatement.executeQuery(loanQuery);
-
-                while (loan_Query.next()) {
-                    int loan_ID = loan_Query.getInt("loan_ID");
-                    String user_ID = loan_Query.getString("user_ID");
-                    String account_ID = loan_Query.getString("account_ID");
-                    Double loan_amount = loan_Query.getDouble("loan_amount");
-                    Date start_date = loan_Query.getDate("start_date");
-                    Date end_date = loan_Query.getDate("end_date");
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return transactions;
     }
 }

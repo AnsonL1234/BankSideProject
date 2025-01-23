@@ -1,36 +1,35 @@
 package src.backend.dataType;
 
+import java.sql.Date;
 import java.util.Random;
 public class Profile {
     private int profileId;
+    private String avatar_path; //avatar_path missing, modify by anson at 12:39 22/01/2025
     private String firstName;
     private String lastName;
-    private String dateOfBirth;
-    private String phoneNumber;
+    private Date dateOfBirth;
+    private int phoneNumber;
     private String specificAddress;
     Random random = new Random();
 
     public Profile() {
-        this.profileId = generateID();
+        this.profileId = 0;
+        this.avatar_path = "";
         this.firstName = "";
         this.lastName = "";
-        this.dateOfBirth = "";
-        this.phoneNumber = "";
+        this.dateOfBirth = null;
+        this.phoneNumber = 0;
         this.specificAddress = "";
     }
 
-    public Profile(int profileId, String firstName, String lastName, String dateOfBirth, String phoneNumber, String specificAddress) {
+    public Profile(int profileId, String avatar, String firstName, String lastName, Date dateOfBirth, int phoneNumber, String specificAddress) {
         this.profileId = profileId;
+        this.avatar_path = avatar;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.phoneNumber = phoneNumber;
         this.specificAddress = specificAddress;
-    }
-
-    private int generateID() {
-         int profileID =+ 1;
-         return profileID;
     }
 
     public int getProfileId() {
@@ -39,6 +38,15 @@ public class Profile {
 
     public void setProfileId(int profileId) {
         this.profileId = profileId;
+    }
+
+    //avatar_path missing, added by anson at 12:39 22/01/2025
+    public String getAvatar_Path() {
+        return avatar_path;
+    }
+
+    public void setAvatar_Path(String avatar) {
+        this.avatar_path = avatar;
     }
 
     public String getFirstName() {
@@ -57,19 +65,19 @@ public class Profile {
         this.lastName = lastName;
     }
 
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getPhoneNumber() {
+    public int getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
+    public void setPhoneNumber(int phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -81,9 +89,11 @@ public class Profile {
         this.specificAddress = specificAddress;
     }
 
+
+    //avatar_path missing, added by anson at 12:39 22/01/2025
     @Override
     public String toString() {
-        return "Profile [profileId=" + profileId + ", firstName=" + firstName + ", lastName=" + lastName
+        return "Profile [profileId=" + profileId + "avatar=" + this.avatar_path + "firstName=" + firstName + ", lastName=" + lastName
                 + ", dateOfBirth=" + dateOfBirth + ", phoneNumber=" + phoneNumber + ", specificAddress="
                 + specificAddress + "]";
     }

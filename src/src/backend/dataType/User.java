@@ -11,15 +11,19 @@ public class User {
     private String emailAddress;
     private Profile profile; // One to One with Profile
     private List<Account> accounts; // One to Many with Account
-    private List<Loan> loans; // One to Many with Loan
-    Random random = new Random();
 
     public User() {
-        this.userID = generateID();
+        this.userID = "";
         this.password = "";
         this.emailAddress = "";
+        this.profile = null;
         this.accounts = new ArrayList<>();
-        this.loans = new ArrayList<>();
+    }
+
+    public User(String userID, String password, String emailAddress) {
+        this.userID = userID;
+        this.password = password;
+        this.emailAddress = emailAddress;
     }
 
     public User(String userID, String password, String emailAddress, Profile profile) {
@@ -28,12 +32,19 @@ public class User {
         this.emailAddress = emailAddress;
         this.profile = profile;
         this.accounts = new ArrayList<>();
-        this.loans = new ArrayList<>();
     }
 
-    private String generateID() {
-        int randomNumber = random.nextInt(1000);
-        return String.format("U%03d", randomNumber);
+    public boolean isValidEmail() {
+        if(this.emailAddress.contains("@gmail.com"))
+            return true;
+        else if (this.emailAddress.contains("@yahoo.com"))
+            return true;
+        else if (this.emailAddress.contains("@mytudublin.ie"))
+            return true;
+        else if (this.emailAddress.contains("@github.com"))
+            return true;
+        else
+            return false;
     }
 
     public String getUserID() {
@@ -76,17 +87,9 @@ public class User {
         this.accounts = accounts;
     }
 
-    public List<Loan> getLoans() {
-        return loans;
-    }
-
-    public void setLoans(List<Loan> loans) {
-        this.loans = loans;
-    }
-
     @Override
     public String toString() {
         return "User [userID=" + userID + ", password=" + password + ", emailAddress=" + emailAddress + ", profile="
-                + profile + ", accounts=" + accounts + ", loans=" + loans + "]";
+                + profile + ", accounts=" + accounts + "]";
     }
 }
