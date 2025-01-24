@@ -38,8 +38,8 @@ public class ID_Generator {
             checkStatement.setString(1, user_ID);
             ResultSet resultSet = checkStatement.executeQuery();
 
-            if(resultSet.next()) {
-                return resultSet.getBoolean(1);
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1); // Get the boolean result from the first column
             }
             return false;
         }
@@ -52,8 +52,8 @@ public class ID_Generator {
             checkStatement.setInt(1, profile_ID);
             ResultSet resultSet = checkStatement.executeQuery();
 
-            if(resultSet.next()) {
-                return resultSet.getBoolean(1);
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1); // Get the boolean result from the first column
             }
             return false;
         }
@@ -66,8 +66,22 @@ public class ID_Generator {
             checkStatement.setString(1, account_ID);
             ResultSet resultSet = checkStatement.executeQuery();
 
-            if(resultSet.next()) {
-                return resultSet.getBoolean(1);
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1); // Get the boolean result from the first column
+            }
+            return false;
+        }
+    }
+
+    public boolean checkUniqueTransactionID(String account_ID, Connection connection) throws SQLException {
+        String query = "SELECT EXISTS (SELECT * FROM bank_app_database.transaction WHERE account_ID = ?)";
+
+        try (PreparedStatement checkStatement = connection.prepareStatement(query)) {
+            checkStatement.setString(1, account_ID);
+            ResultSet resultSet = checkStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getBoolean(1); // Get the boolean result from the first column
             }
             return false;
         }

@@ -29,32 +29,43 @@ public class Insert extends DatabaseConnection {
             connectDatabase = DriverManager.getConnection(url, username, password);
             connectDatabase.setAutoCommit(false);
 
-            boolean isUserIDUnique, isAccountIDUnique, isProfileIDUnique;
+            try {
+                boolean isUserIDUnique = false, isAccountIDUnique = false, isProfileIDUnique = false;
 
-            do {
-                try {
-                    System.out.println("Checking user_ID: " + user_ID);
-                    isUserIDUnique = !idGenerator.checkUniqueUserID(user_ID, connectDatabase);
-                    if (!isUserIDUnique) {
+                do {
+                    System.out.println("Checking user ID " + user_ID);
+                    System.out.println(idGenerator.checkUniqueUserID(user_ID,connectDatabase));
+                    if (!idGenerator.checkUniqueUserID(user_ID,connectDatabase)) {
+                        isUserIDUnique = true;
+                    } else {
                         user_ID = idGenerator.generate_user_ID();
+                        System.out.println("Re-generate User ID " + user_ID);
                     }
+                } while(!isUserIDUnique);
 
-                    System.out.println("Checking account_ID: " + account_ID);
-                    isAccountIDUnique = !idGenerator.checkUniqueAccountID(account_ID, connectDatabase);
-                    if (!isAccountIDUnique) {
-                        account_ID = idGenerator.generate_account_ID();
+                do {
+                    System.out.println("Checking Profile ID " + account_ID);
+                    if (!idGenerator.checkUniqueAccountID(account_ID,connectDatabase)) {
+                        isAccountIDUnique = true;
+                    } else {
+                        account_ID = idGenerator.generate_user_ID();
+                        System.out.println("Re-generate Account ID " + account_ID);
                     }
+                } while(!isAccountIDUnique);
 
-                    System.out.println("Checking profile_ID: " + profile_ID);
-                    isProfileIDUnique = !idGenerator.checkUniqueProfileID(profile_ID, connectDatabase);
-                    if (!isProfileIDUnique) {
-                        profile_ID = idGenerator.generate_profile_ID();
+                do {
+                    System.out.println("Checking Profile ID " + profile_ID);
+                    if (!idGenerator.checkUniqueProfileID(profile_ID,connectDatabase)) {
+                        isProfileIDUnique = true;
+                    } else {
+                        profile_ID = 4;
+                        System.out.println("Re-generate Profile ID " + profile_ID);
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    break; // Exit the loop if an error occurs to prevent infinite looping
-                }
-            } while (!isUserIDUnique || !isAccountIDUnique || !isProfileIDUnique);
+                } while(!isProfileIDUnique);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
             // Insert into profile table
             PreparedStatement new_profile = connectDatabase.prepareStatement(profileQuery);
@@ -109,10 +120,8 @@ public class Insert extends DatabaseConnection {
 
             if (rowsAffectedProfile > 0 && rowsAffectedAccount > 0 && rowsAffectedUser > 0) {
                 System.out.println("User added to the database successfully.");
-            } else {
-                connectDatabase.rollback();
-                System.out.println("User not added to the database.");
             }
+            System.out.println("Register Successfully!");
         } catch (SQLException e) {
 
             /** when java check if there is value when catching the error, rollback/delete the value
@@ -210,8 +219,8 @@ public class Insert extends DatabaseConnection {
         }
     }
 
-    public boolean isLoanInsert(
-            int loan_ID, String user_ID, String account_ID, Double loan_amount, Date start_date, Date end_date
+    public void newLoanInsert(
+            int loan_ID, String user_ID, String account_ID, Double loan_amount, Timestamp start_date, Timestamp end_date
     ) {
         Connection connectDatabase = null;
 
@@ -226,8 +235,8 @@ public class Insert extends DatabaseConnection {
             new_loan.setString(2, user_ID);
             new_loan.setString(3, account_ID);
             new_loan.setDouble(4, loan_amount);
-            new_loan.setDate(4, start_date);
-            new_loan.setDate(4, end_date);
+            new_loan.setTimestamp(4, start_date);
+            new_loan.setTimestamp(4, end_date);
             int rowAffectedLoan = new_loan.executeUpdate();
 
             //commit the change after execute the row
@@ -235,10 +244,7 @@ public class Insert extends DatabaseConnection {
 
             if(rowAffectedLoan > 0) {
                 System.out.println("New transaction added to the database!");
-                return true;
             }
-
-            return true;
         } catch (SQLException e) {
             try {
                 if (connectDatabase != null) {
@@ -247,7 +253,6 @@ public class Insert extends DatabaseConnection {
             } catch (SQLException e1) {
                 System.out.println("New transaction failed add to database!");
             }
-            return false;
         }
     }
 

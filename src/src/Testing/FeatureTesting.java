@@ -17,8 +17,10 @@ public class FeatureTesting {
     private Scanner scan = new Scanner(System.in);
 
     public FeatureTesting() {
-        transaction();
+//        transaction();
 //        list_transaction();
+        login();
+//        user_Registration();
     }
 
     public void retrieveData() {
@@ -28,29 +30,31 @@ public class FeatureTesting {
 
     //testing login function
     public void login() {
-        String email_address, password;
+        String email_address = "taydon@gmail.com", password = "admin2";
+        Select retrieveByLogin = new Select();
+        retrieveByLogin.retrieveInfoByLogin(email_address,password);
     }
 
     //testing the user registration table
-//    public void user_Registration() {
-//        ID_Generator idGenerator = new ID_Generator();
-//        Insert userRegister = new Insert();
-//
-//        //variable for register user
-//        String user_ID = idGenerator.generate_user_ID();
-//
-//        //variable for profile detail
-//        int profile_ID = idGenerator.generate_profile_ID();
-//
-//        //variable for account detail
-//        String account_ID = idGenerator.generate_account_ID();
-//
-//        userRegister.userRegistration(
-//               user_ID,"admin2","taydon@gmail.com",
-//                2, "E:\\Image\\download.jpg","Taydon","Ling",Date.valueOf("2006-01-15"),874061518, "SandyFord Road, Dundrum, D16R588",
-//                account_ID,"business",100, 90,"EUR","Europe Currency"
-//        );
-//    }
+    public void user_Registration() {
+        ID_Generator idGenerator = new ID_Generator();
+        Insert userRegister = new Insert();
+
+        //variable for register user
+        String user_ID = idGenerator.generate_user_ID();
+
+        //variable for profile detail
+        int profile_ID = idGenerator.generate_profile_ID();
+
+        //variable for account detail
+        String account_ID = idGenerator.generate_account_ID();
+
+        userRegister.userRegistration(
+               "UID17423","admin3","ivan@gmail.com",
+                3, "E:\\Image\\download.jpg","Ivan","Chen",Date.valueOf("2003-02-09"),87431042, "SandyFord Road, Dundrum, D16R588",
+                "AID19362","premium",100, 90,"EUR","Europe Currency"
+        );
+    }
 
     //method that testing the transaction
     public void transaction() {

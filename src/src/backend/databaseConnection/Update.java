@@ -1,6 +1,7 @@
 package src.backend.databaseConnection;
 
 import src.backend.ID_Generator;
+import src.backend.dataType.Loan;
 
 import java.sql.*;
 import java.text.DecimalFormat;
@@ -26,12 +27,12 @@ public class Update extends DatabaseConnection {
         try{
             databaseConnect = DriverManager.getConnection(url,username,password);
             databaseConnect.setAutoCommit(false);
-            System.out.println("Connect to database");
+//            System.out.println("Connect to database");
 
 
             //execute statement for update the transaction query after the user send the money
             PreparedStatement updateSender = databaseConnect.prepareStatement(updateSenderQuery);
-            System.out.println("Preparing statement");
+//            System.out.println("Preparing statement");
             updateSender.setDouble(1, amount);
             updateSender.setDouble(2, amount);
             updateSender.setString(3, payment_ID);
@@ -43,12 +44,13 @@ public class Update extends DatabaseConnection {
 
             //execute this statement for update the transaction query after the user receive the money
             PreparedStatement updateReceiver = databaseConnect.prepareStatement(updateReceiverQuery);
-            System.out.println("Preparing second statement");
+//            System.out.println("Preparing second statement");
             updateReceiver.setDouble(1, amount);
             updateReceiver.setDouble(2, amount);
             updateReceiver.setString(3, payment_receiver_ID);
             int rowsReceiver = updateReceiver.executeUpdate();
 
+            //debug
             if (rowsReceiver == 0) {
                 System.out.println("No rows updated for receiver. Check account ID: " + payment_receiver_ID);
             }
@@ -57,6 +59,7 @@ public class Update extends DatabaseConnection {
             databaseConnect.commit();
             System.out.println("Transaction processed successfully.");
 
+            //record the transaction after the commit
             ID_Generator idGenerator = new ID_Generator();
             LocalDateTime localDateTime = LocalDateTime.now();
             Timestamp timestamp = Timestamp.valueOf(localDateTime);
@@ -77,7 +80,7 @@ public class Update extends DatabaseConnection {
 
     /** Apply Loan is the method that will process the loan application */
     public void applyLoan(
-            String user_ID, String account_ID, Double loan_amount
+            String user_ID, String account_ID, double loan_amount
     ) {
 
         //query for update the account
@@ -85,6 +88,8 @@ public class Update extends DatabaseConnection {
                 " available_balance = available_balance + ? WHERE user_ID = ? AND account_ID = ?";
 
         Connection databaseConnection = null;
+
+        Insert insertLoanRecord = new Insert();
 
         try {
             databaseConnection = DriverManager.getConnection(url,username,password);
@@ -100,6 +105,11 @@ public class Update extends DatabaseConnection {
 
             //commit the update after executing the query
             databaseConnection.commit();
+
+            ID_Generator idGenerator = new ID_Generator();
+            LocalDateTime localDateTime = LocalDateTime.now();
+            Timestamp timestamp = Timestamp.valueOf(localDateTime);
+            insertLoanRecord.newLoanInsert(idGenerator.generate_loan_ID(),user_ID,account_ID,loan_amount,timestamp,timestamp);
 
         } catch (SQLException e) {
             try {
