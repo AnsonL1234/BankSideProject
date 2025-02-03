@@ -10,7 +10,6 @@ public class Profile {
     private Date dateOfBirth;
     private int phoneNumber;
     private String specificAddress;
-    Random random = new Random();
 
     public Profile() {
         this.profileId = 0;

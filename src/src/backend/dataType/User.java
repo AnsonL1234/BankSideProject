@@ -26,7 +26,7 @@ public class User {
         this.emailAddress = emailAddress;
     }
 
-    public User(String userID, String password, String emailAddress, Profile profile) {
+    public User(String userID, String password, String emailAddress, Profile profile, Account account) {
         this.userID = userID;
         this.password = password;
         this.emailAddress = emailAddress;

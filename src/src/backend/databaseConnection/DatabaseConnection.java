@@ -11,5 +11,9 @@ public class DatabaseConnection {
     static protected final String username = "SkyBank";
     static protected final String password = "dtbs@anson-1001";
 
+    public static Connection getConnect() throws SQLException {
+        return DriverManager.getConnection(url,username,password);
+    }
+
 
 }

@@ -6,14 +6,13 @@ import java.sql.*;
 
 public class Insert extends DatabaseConnection {
 
+    private Connection connectDatabase = null;
     /** Insertion the new value for user registration */
     public void userRegistration(
             String user_ID, String user_password, String email_address,
             int profile_ID, String avatar_path, String first_name, String last_name, Date date_of_birth, int phone_number, String address,
             String account_ID, String type_of_account, double current_balance, double available_balance, String currency_ID, String currency_name
     ) {
-
-        Connection connectDatabase = null;
 
         ID_Generator idGenerator = new ID_Generator();
 
@@ -26,46 +25,8 @@ public class Insert extends DatabaseConnection {
         try {
 
             //connect to the database by url, username, and password
-            connectDatabase = DriverManager.getConnection(url, username, password);
+            connectDatabase = getConnect();
             connectDatabase.setAutoCommit(false);
-
-            try {
-                boolean isUserIDUnique = false, isAccountIDUnique = false, isProfileIDUnique = false;
-
-                do {
-                    System.out.println("Checking user ID " + user_ID);
-                    System.out.println(idGenerator.checkUniqueUserID(user_ID,connectDatabase));
-                    if (!idGenerator.checkUniqueUserID(user_ID,connectDatabase)) {
-                        isUserIDUnique = true;
-                    } else {
-                        user_ID = idGenerator.generate_user_ID();
-                        System.out.println("Re-generate User ID " + user_ID);
-                    }
-                } while(!isUserIDUnique);
-
-                do {
-                    System.out.println("Checking Profile ID " + account_ID);
-                    if (!idGenerator.checkUniqueAccountID(account_ID,connectDatabase)) {
-                        isAccountIDUnique = true;
-                    } else {
-                        account_ID = idGenerator.generate_user_ID();
-                        System.out.println("Re-generate Account ID " + account_ID);
-                    }
-                } while(!isAccountIDUnique);
-
-                do {
-                    System.out.println("Checking Profile ID " + profile_ID);
-                    if (!idGenerator.checkUniqueProfileID(profile_ID,connectDatabase)) {
-                        isProfileIDUnique = true;
-                    } else {
-                        profile_ID = 4;
-                        System.out.println("Re-generate Profile ID " + profile_ID);
-                    }
-                } while(!isProfileIDUnique);
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
 
             // Insert into profile table
             PreparedStatement new_profile = connectDatabase.prepareStatement(profileQuery);
@@ -135,7 +96,8 @@ public class Insert extends DatabaseConnection {
                 System.out.println("Failed to roll back!");
             }
             System.out.println("Connection failed!");
-            e.printStackTrace();
+            System.out.println("SQL EXCEPTION FOUND!");
+//            e.printStackTrace();
         }
     }
 
@@ -144,12 +106,11 @@ public class Insert extends DatabaseConnection {
             int transaction_ID, String payment_ID, String payment_Receiver_ID,
             double transaction_amount, Timestamp transfer_date
     ) {
-        Connection connectDatabase = null;
 
         String transactionQuery = "INSERT INTO bank_app_database.transaction (transaction_ID, payment_ID, payment_receiver_ID, transaction_amount, transfer_date) VALUES(?,?,?,?,?)";
 
         try {
-            connectDatabase = DriverManager.getConnection(url, username, password);
+            connectDatabase = getConnect();
             connectDatabase.setAutoCommit(false);
 
             PreparedStatement new_transaction = connectDatabase.prepareStatement(transactionQuery);
@@ -183,12 +144,11 @@ public class Insert extends DatabaseConnection {
     public boolean isCurrencyExchangeInsert(
             int exchange_ID, String base_exchange_currency, String target_exchange_currency, Double exchange_date
     ) {
-        Connection connectDatabase = null;
 
         String currencyExchangeQuery = "INSERT INTO bank_app_database.currency_exchange VALUES(?,?,?,?)";
 
         try {
-            connectDatabase = DriverManager.getConnection(url, username, password);
+            connectDatabase = getConnect();
             connectDatabase.setAutoCommit(false);
 
             PreparedStatement new_exchange_rate = connectDatabase.prepareStatement(currencyExchangeQuery);
@@ -222,12 +182,11 @@ public class Insert extends DatabaseConnection {
     public void newLoanInsert(
             int loan_ID, String user_ID, String account_ID, Double loan_amount, Timestamp start_date, Timestamp end_date
     ) {
-        Connection connectDatabase = null;
 
         String loanQuery = "INSERT INTO bank_app_database.loan VALUES(?,?,?,?,?,?)";
 
         try {
-            connectDatabase = DriverManager.getConnection(url, username, password);
+            connectDatabase = getConnect();
             connectDatabase.setAutoCommit(false);
 
             PreparedStatement new_loan = connectDatabase.prepareStatement(loanQuery);

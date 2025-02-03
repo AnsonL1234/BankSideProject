@@ -1,6 +1,7 @@
 package src.Testing;
 
 import src.backend.ID_Generator;
+import src.backend.ManagementSystem;
 import src.backend.dataType.Transaction;
 import src.backend.databaseConnection.*;
 
@@ -31,14 +32,14 @@ public class FeatureTesting {
     //testing login function
     public void login() {
         String email_address = "taydon@gmail.com", password = "admin2";
-        Select retrieveByLogin = new Select();
-        retrieveByLogin.retrieveInfoByLogin(email_address,password);
+        ManagementSystem retrieveByLogin = new ManagementSystem();
+        retrieveByLogin.usersLogin(email_address,password);
     }
 
     //testing the user registration table
     public void user_Registration() {
         ID_Generator idGenerator = new ID_Generator();
-        Insert userRegister = new Insert();
+        ManagementSystem userRegistration = new ManagementSystem();
 
         //variable for register user
         String user_ID = idGenerator.generate_user_ID();
@@ -49,8 +50,8 @@ public class FeatureTesting {
         //variable for account detail
         String account_ID = idGenerator.generate_account_ID();
 
-        userRegister.userRegistration(
-               "UID17423","admin3","ivan@gmail.com",
+        userRegistration.usersRegistration(
+                "UID17423","admin3","ivan@gmail.com",
                 3, "E:\\Image\\download.jpg","Ivan","Chen",Date.valueOf("2003-02-09"),87431042, "SandyFord Road, Dundrum, D16R588",
                 "AID19362","premium",100, 90,"EUR","Europe Currency"
         );

@@ -1,5 +1,6 @@
 package src.backend.dataType;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,8 +13,7 @@ public class Account {
     private double currentBalance;
     private double availableBalance;
     private Currency currency; // One to One with Currency
-    private List<Transaction> transactions; // OnetoMany with Transaction
-    Random random = new Random();
+    private List<Transaction> transactions; // One to Many with Transaction
 
     public Account() {
         this.accountId = "";
@@ -24,6 +24,14 @@ public class Account {
     }
 
     public Account(String accountId, String typeOfAccount, double currentBalance, double availableBalance, Currency currency) {
+        this.accountId = accountId;
+        this.typeOfAccount = typeOfAccount;
+        this.currentBalance = currentBalance;
+        this.availableBalance = availableBalance;
+        this.currency = currency;
+    }
+
+    public Account(String accountId, String typeOfAccount, double currentBalance, double availableBalance, Currency currency, Transaction transaction) {
         this.accountId = accountId;
         this.typeOfAccount = typeOfAccount;
         this.currentBalance = currentBalance;
@@ -85,15 +93,5 @@ public class Account {
         return "Account [accountId=" + accountId + ", typeOfAccount=" + typeOfAccount + ", currentBalance="
                 + currentBalance + ", availableBalance=" + availableBalance + ", currency=" + currency
                 + ", transactions=" + transactions + "]";
-    }
-    public static void main(String[] args) {
-
-        Account account1 = new Account();
-        Account account2 = new Account();
-        Account account3 = new Account();
-
-        System.out.println("Account 1 ID: " + account1.getAccountId());
-        System.out.println("Account 2 ID: " + account2.getAccountId());
-        System.out.println("Account 3 ID: " + account3.getAccountId());
     }
 }
